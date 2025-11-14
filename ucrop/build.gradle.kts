@@ -1,12 +1,9 @@
-import java.io.FileInputStream
-import java.io.InputStreamReader
-import java.util.Properties
-import net.thebugmc.gradle.sonatypepublisher.PublishingType.AUTOMATIC
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-plugins{
+plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
-    id("net.thebugmc.gradle.sonatype-central-portal-publisher") version "1.2.4"
+    id("maven-publish")
 }
 android {
     namespace = "com.yalantis.ucrop"
@@ -20,12 +17,17 @@ android {
     }
     buildTypes {
         release {
-            isMinifyEnabled  = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"),"proguard-rules.pro")
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
-    kotlinOptions {
-        jvmTarget = "21"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
@@ -39,11 +41,17 @@ android {
 
     resourcePrefix = "ucrop_"
 
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
 }
 
 dependencies {
     implementation(libs.androidx.appcompat)
-    implementation (libs.androidx.activity)
+    implementation(libs.androidx.activity)
     implementation(libs.androidx.exifinterface)
     implementation(libs.androidx.transition)
     implementation(libs.okhttp)
@@ -51,81 +59,5 @@ dependencies {
     implementation(libs.gson)
 }
 
-var signingKeyId = ""//签名的密钥后8位
-var signingPassword = ""//签名设置的密码
-var secretKeyRingFile = ""//生成的secring.gpg文件目录
-var ossrhUsername = ""//sonatype用户名
-var ossrhPassword = "" //sonatype密码
-
-val localProperties = project.rootProject.file("local.properties")
-
-if (localProperties.exists()) {
-    println("Found secret props file, loading props")
-    val properties = Properties()
-
-    InputStreamReader(FileInputStream(localProperties), Charsets.UTF_8).use { reader ->
-        properties.load(reader)
-    }
-    signingKeyId = properties.getProperty("signingKeyId")
-    signingPassword = properties.getProperty("signingPassword")
-    secretKeyRingFile = properties.getProperty("secretKeyRingFile")
-    ossrhUsername = properties.getProperty("ossrhUsername")
-    ossrhPassword = properties.getProperty("ossrhPassword")
-
-} else {
-    println("No props file, loading env vars")
-}
 
 
-centralPortal {
-    username = ossrhUsername
-    password = ossrhPassword
-    name = "ucrop"
-    group = "io.github.liyuhaolol"
-    version = "v3.11.7"
-    pom {
-        //packaging = "aar"
-        name = "ucrop"
-        description = "Android PictureSelector Utils"
-        url = "https://github.com/liyuhaolol/PictureSelector"
-        licenses {
-            license {
-                name = "Apache License"
-                url = "https://github.com/liyuhaolol/PictureSelector/blob/master/LICENSE"
-            }
-        }
-        developers {
-            developer {
-                id = "liyuhao"
-                name = "liyuhao"
-                email = "liyuhaoid@sina.com"
-            }
-        }
-        scm {
-            connection = "scm:git@github.com/liyuhaolol/PictureSelector.git"
-            developerConnection = "scm:git@github.com/liyuhaolol/PictureSelector.git"
-            url = "https://github.com/liyuhaolol/PictureSelector"
-        }
-
-    }
-    publishingType = AUTOMATIC
-    javadocJarTask = tasks.create<Jar>("javadocEmptyJar") {
-        archiveClassifier = "javadoc"
-    }
-
-}
-
-
-gradle.taskGraph.whenReady {
-    if (allTasks.any { it is Sign }) {
-        allprojects {
-            extra["signing.keyId"] = signingKeyId
-            extra["signing.secretKeyRingFile"] = secretKeyRingFile
-            extra["signing.password"] = signingPassword
-        }
-    }
-}
-
-signing {
-    sign(publishing.publications)
-}

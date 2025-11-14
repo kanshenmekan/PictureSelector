@@ -1,6 +1,5 @@
 package com.yalantis.ucrop;
 
-import android.annotation.TargetApi;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -12,12 +11,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.RelativeLayout;
@@ -26,7 +23,6 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.SystemBarStyle;
-import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -102,7 +98,7 @@ public class UCropMultipleActivity extends AppCompatActivity implements UCropFra
                 SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             Window window = this.getWindow();
-            if (window != null){
+            if (window != null) {
                 window.setStatusBarContrastEnforced(false);
                 window.setNavigationBarContrastEnforced(false);
             }
@@ -117,8 +113,8 @@ public class UCropMultipleActivity extends AppCompatActivity implements UCropFra
     @Override
     protected void onResume() {
         super.onResume();
-        AndroidBarUtils.setStatusBarMode(getWindow(), false);
-        AndroidBarUtils.setNavBarMode(getWindow(), false);
+//        AndroidBarUtils.setStatusBarMode(getWindow(), false);
+//        AndroidBarUtils.setNavBarMode(getWindow(), false);
     }
 
     private void initCropFragments(Intent intent) {
@@ -302,6 +298,12 @@ public class UCropMultipleActivity extends AppCompatActivity implements UCropFra
     }
 
     private void setupViews(@NonNull Intent intent) {
+        if (intent.hasExtra(UCrop.Options.EXTRA_DARK_STATUS_BAR_BLACK)) {
+            AndroidBarUtils.setStatusBarMode(getWindow(), intent.getBooleanExtra(UCrop.Options.EXTRA_DARK_STATUS_BAR_BLACK, false));
+        }
+        if (intent.hasExtra(UCrop.Options.EXTRA_DARK_NAVIGATION_BAR_BLACK)) {
+            AndroidBarUtils.setNavBarMode(getWindow(), intent.getBooleanExtra(UCrop.Options.EXTRA_DARK_NAVIGATION_BAR_BLACK, false));
+        }
         aspectRatioList = getIntent().getParcelableArrayListExtra(UCrop.Options.EXTRA_MULTIPLE_ASPECT_RATIO);
         isForbidCropGifWebp = intent.getBooleanExtra(UCrop.Options.EXTRA_CROP_FORBID_GIF_WEBP, false);
         outputCropFileName = intent.getStringExtra(UCrop.Options.EXTRA_CROP_OUTPUT_FILE_NAME);

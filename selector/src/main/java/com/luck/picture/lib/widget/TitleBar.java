@@ -130,10 +130,10 @@ public class TitleBar extends RelativeLayout implements View.OnClickListener {
     }
 
     public void setTitleBarStyle() {
-        if (config.isPreviewFullScreenMode) {
-            ViewGroup.LayoutParams layoutParams = viewTopStatusBar.getLayoutParams();
-            layoutParams.height = DensityUtil.getStatusBarHeight(getContext());
-        }
+//        if (config.isPreviewFullScreenMode) {
+        ViewGroup.LayoutParams layoutParams = viewTopStatusBar.getLayoutParams();
+        layoutParams.height = DensityUtil.getStatusBarHeight(getContext());
+//        }
         PictureSelectorStyle selectorStyle = config.selectorStyle;
         TitleBarStyle titleBarStyle = selectorStyle.getTitleBarStyle();
         int titleBarHeight = titleBarStyle.getTitleBarHeight();

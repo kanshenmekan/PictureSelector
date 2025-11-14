@@ -346,6 +346,7 @@ public class UCrop {
 
         public static final String EXTRA_DARK_STATUS_BAR_BLACK = EXTRA_PREFIX + ".isDarkStatusBarBlack";
 
+        public static final String EXTRA_DARK_NAVIGATION_BAR_BLACK = EXTRA_PREFIX + ".isDarkNavigationBarBlack";
         public static final String EXTRA_DRAG_IMAGES = EXTRA_PREFIX + ".isDragImages";
 
         public static final String EXTRA_CROP_CUSTOM_LOADER_BITMAP = EXTRA_PREFIX + ".CustomLoaderCropBitmap";
@@ -620,6 +621,10 @@ public class UCrop {
 
         public void isDarkStatusBarBlack(boolean isDarkStatusBarBlack) {
             mOptionBundle.putBoolean(EXTRA_DARK_STATUS_BAR_BLACK, isDarkStatusBarBlack);
+        }
+
+        public void isDarkNavigationBarBlack(boolean isDarkNavigationBarBlack) {
+            mOptionBundle.putBoolean(EXTRA_DARK_NAVIGATION_BAR_BLACK, isDarkNavigationBarBlack);
         }
 
         /**

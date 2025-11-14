@@ -1,7 +1,5 @@
 package com.luck.picture.lib.style;
 
-import android.widget.RelativeLayout;
-
 /**
  * @author：luck
  * @date：2021/11/15 4:14 下午
@@ -169,7 +167,6 @@ public class SelectMainStyle {
 
     /**
      * 勾选样式位置
-     *
      */
     private int[] adapterSelectStyleGravity;
 
@@ -190,7 +187,6 @@ public class SelectMainStyle {
 
     /**
      * 时长文字位置
-     *
      */
     private int[] adapterDurationGravity;
 
@@ -241,7 +237,6 @@ public class SelectMainStyle {
     private int adapterTagTextColor;
     /**
      * 资源标识的位置
-     *
      */
     private int[] adapterTagGravity;
     /**
@@ -251,7 +246,6 @@ public class SelectMainStyle {
 
     /**
      * 图片被编辑标识位置
-     *
      */
     private int[] adapterImageEditorGravity;
 

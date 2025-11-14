@@ -1,11 +1,6 @@
-import java.io.FileInputStream
-import java.io.InputStreamReader
-import java.util.Properties
-import net.thebugmc.gradle.sonatypepublisher.PublishingType.AUTOMATIC
-
-plugins{
+plugins {
     id("com.android.library")
-    id("net.thebugmc.gradle.sonatype-central-portal-publisher") version "1.2.4"
+    id("maven-publish")
 }
 
 android {
@@ -31,15 +26,25 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled  = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"),"proguard-rules.pro")
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
         }
     }
 }
 
 dependencies {
     implementation(libs.androidx.appcompat)
-    implementation (libs.androidx.activity)
+    implementation(libs.androidx.activity)
     implementation(libs.androidx.recyclerview)
     //implementation "androidx.activity:activity:${cfgs.activity_version}"
     //implementation "androidx.fragment:fragment:${cfgs.fragment_version}"
@@ -48,81 +53,19 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
 }
 
-var signingKeyId = ""//签名的密钥后8位
-var signingPassword = ""//签名设置的密码
-var secretKeyRingFile = ""//生成的secring.gpg文件目录
-var ossrhUsername = ""//sonatype用户名
-var ossrhPassword = "" //sonatype密码
+val VERSION_NAME = "1.0"
+val GROUP_ID = "com.github.kanshenmekan"
+val ARTIFACT_ID = "selector"
 
-val localProperties = project.rootProject.file("local.properties")
-
-if (localProperties.exists()) {
-    println("Found secret props file, loading props")
-    val properties = Properties()
-
-    InputStreamReader(FileInputStream(localProperties), Charsets.UTF_8).use { reader ->
-        properties.load(reader)
-    }
-    signingKeyId = properties.getProperty("signingKeyId")
-    signingPassword = properties.getProperty("signingPassword")
-    secretKeyRingFile = properties.getProperty("secretKeyRingFile")
-    ossrhUsername = properties.getProperty("ossrhUsername")
-    ossrhPassword = properties.getProperty("ossrhPassword")
-
-} else {
-    println("No props file, loading env vars")
-}
-
-
-centralPortal {
-    username = ossrhUsername
-    password = ossrhPassword
-    name = "PictureSelector"
-    group = "io.github.liyuhaolol"
-    version = "v3.11.8"
-    pom {
-        //packaging = "aar"
-        name = "PictureSelector"
-        description = "Android PictureSelector Utils"
-        url = "https://github.com/liyuhaolol/PictureSelector"
-        licenses {
-            license {
-                name = "Apache License"
-                url = "https://github.com/liyuhaolol/PictureSelector/blob/master/LICENSE"
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                groupId = GROUP_ID
+                artifactId = ARTIFACT_ID
+                version = VERSION_NAME
+                from(components["release"])
             }
         }
-        developers {
-            developer {
-                id = "liyuhao"
-                name = "liyuhao"
-                email = "liyuhaoid@sina.com"
-            }
-        }
-        scm {
-            connection = "scm:git@github.com/liyuhaolol/PictureSelector.git"
-            developerConnection = "scm:git@github.com/liyuhaolol/PictureSelector.git"
-            url = "https://github.com/liyuhaolol/PictureSelector"
-        }
-
     }
-    publishingType = AUTOMATIC
-    javadocJarTask = tasks.create<Jar>("javadocEmptyJar") {
-        archiveClassifier = "javadoc"
-    }
-
-}
-
-
-gradle.taskGraph.whenReady {
-    if (allTasks.any { it is Sign }) {
-        allprojects {
-            extra["signing.keyId"] = signingKeyId
-            extra["signing.secretKeyRingFile"] = secretKeyRingFile
-            extra["signing.password"] = signingPassword
-        }
-    }
-}
-
-signing {
-    sign(publishing.publications)
 }

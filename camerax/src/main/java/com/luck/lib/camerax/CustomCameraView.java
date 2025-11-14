@@ -32,7 +32,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.camera.camera2.interop.Camera2CameraInfo;
 import androidx.camera.core.AspectRatio;
 import androidx.camera.core.Camera;
@@ -48,7 +47,6 @@ import androidx.camera.core.MeteringPoint;
 import androidx.camera.core.MeteringPointFactory;
 import androidx.camera.core.Preview;
 import androidx.camera.core.UseCaseGroup;
-//import androidx.camera.core.VideoCapture;
 import androidx.camera.core.ZoomState;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.video.FileOutputOptions;
@@ -61,6 +59,9 @@ import androidx.camera.video.VideoRecordEvent;
 import androidx.camera.view.LifecycleCameraController;
 import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 
@@ -81,8 +82,6 @@ import com.luck.lib.camerax.utils.FileUtils;
 import com.luck.lib.camerax.utils.SimpleXSpUtils;
 import com.luck.lib.camerax.widget.CaptureLayout;
 import com.luck.lib.camerax.widget.FocusImageView;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -275,6 +274,16 @@ public class CustomCameraView extends RelativeLayout implements CameraXOrientati
             @Override
             public void onClick(View v) {
                 toggleCamera();
+            }
+        });
+        ViewCompat.setOnApplyWindowInsetsListener(this, new androidx.core.view.OnApplyWindowInsetsListener() {
+            @Override
+            public @org.jspecify.annotations.NonNull WindowInsetsCompat onApplyWindowInsets(@org.jspecify.annotations.NonNull View v, @org.jspecify.annotations.NonNull WindowInsetsCompat insets) {
+                Insets navInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
+                RelativeLayout.LayoutParams params = (LayoutParams) mCaptureLayout.getLayoutParams();
+                params.setMargins(navInset.left, navInset.top, navInset.right, navInset.bottom);
+                mCaptureLayout.setLayoutParams(params);
+                return insets;
             }
         });
 
@@ -622,7 +631,7 @@ public class CustomCameraView extends RelativeLayout implements CameraXOrientati
     /**
      * 停止检测手机方向
      */
-    public void stopCheckOrientation(){
+    public void stopCheckOrientation() {
         if (orientationEventListener != null) {
             orientationEventListener.stop();
         }
@@ -719,7 +728,7 @@ public class CustomCameraView extends RelativeLayout implements CameraXOrientati
             List<CameraInfo> cameraInfos = CameraSelector.DEFAULT_BACK_CAMERA
                     .filter(cameraProvider.getAvailableCameraInfos());
             if (!cameraInfos.isEmpty()) {
-                return  Objects.equals(Camera2CameraInfo.from(cameraInfos.get(0)).getCameraCharacteristic(
+                return Objects.equals(Camera2CameraInfo.from(cameraInfos.get(0)).getCameraCharacteristic(
                         CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL), CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY);
             }
         }
@@ -950,7 +959,7 @@ public class CustomCameraView extends RelativeLayout implements CameraXOrientati
         private final WeakReference<CameraListener> mCameraListenerReference;
         private final WeakReference<CustomCameraView> mCameraViewLayoutReference;
 
-        public MyImageResultCallback(CustomCameraView cameraView,ImageView imagePreview, View imagePreviewBg, CaptureLayout captureLayout,
+        public MyImageResultCallback(CustomCameraView cameraView, ImageView imagePreview, View imagePreviewBg, CaptureLayout captureLayout,
                                      ImageCallbackListener imageCallbackListener,
                                      CameraListener cameraListener) {
             this.mCameraViewLayoutReference = new WeakReference<>(cameraView);

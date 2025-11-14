@@ -25,6 +25,10 @@ import spa.lyh.cn.chooser.engine.ChooserCropFileEngine;
 import spa.lyh.cn.chooser.engine.OpenGalleryEngine;
 
 public class PicChooser {
+    public interface PictureSelectionModelSupplier {
+        void supply(PictureSelectionModel model);
+    }
+
     public int chooseMode = SelectMimeType.ofAll();
     public boolean isGif = true;
     public int selectionMode = SelectModeConfig.MULTIPLE;
@@ -36,24 +40,28 @@ public class PicChooser {
     public OpenGalleryEngine openGalleryEngine = null;
     public OnResultCallbackListener<LocalMedia> callback = null;
     private ImageEngine imageEngine = null;
-    /////////////////////////////////////
+
+    public PictureSelectionModelSupplier pictureSelectionModelSupplier = null;
+    /// //////////////////////////////////
     private Context context;
 
-    private PicChooser(Context context){
+    private PicChooser(Context context) {
         this.context = context;
     }
 
-    public static PicChooser with(Context context){
+    public static PicChooser with(Context context) {
         return new PicChooser(context);
     }
-    public static PicChooser with(Fragment fragment){
+
+    public static PicChooser with(Fragment fragment) {
         return new PicChooser(fragment.requireActivity());
     }
 
-    public static PicChooser with(android.app.Fragment fragment){
+    public static PicChooser with(android.app.Fragment fragment) {
         return new PicChooser(fragment.getActivity());
     }
-    //////////////////////////////////////////////////
+
+    /// ///////////////////////////////////////////////
     public PicChooser openGallery(int chooseMode) {
         this.chooseMode = chooseMode;
         return this;
@@ -99,15 +107,21 @@ public class PicChooser {
         return this;
     }
 
-    private void build12(){
+    public PicChooser setSupplyPictureSelectionModelListener(PictureSelectionModelSupplier pictureSelectionModelSupplier) {
+        this.pictureSelectionModelSupplier = pictureSelectionModelSupplier;
+        return this;
+    }
+
+    private void build12() {
         build12after(PictureSelector.create(context));
     }
-    private void build12after(PictureSelector selector){
+
+    private void build12after(PictureSelector selector) {
         model = selector
                 .openGallery(chooseMode)
                 .isGif(isGif)
                 .setSelectionMode(selectionMode);
-        if (selectionMode == SelectModeConfig.MULTIPLE){
+        if (selectionMode == SelectModeConfig.MULTIPLE) {
             model.setMaxSelectNum(maxSelectNum);
         }
         model.setSelectorUIStyle(uiStyle)
@@ -119,7 +133,7 @@ public class PicChooser {
                 .setPermissionsInterceptListener(new OnPermissionsInterceptListener() {
                     @Override
                     public void requestPermission(Fragment fragment, String[] permissionArray, OnRequestPermissionListener call) {
-                        call.onCall(permissionArray,true);
+                        call.onCall(permissionArray, true);
                     }
 
                     @Override
@@ -128,32 +142,35 @@ public class PicChooser {
                     }
 
                 });
+        if (pictureSelectionModelSupplier != null) {
+            pictureSelectionModelSupplier.supply(model);
+        }
     }
 
-    public void forResult(OnResultCallbackListener<LocalMedia> callback){
+    public void forResult(OnResultCallbackListener<LocalMedia> callback) {
         this.callback = callback;
-        if (maxSelectNum <= 1){
-            if (selectionMode == SelectModeConfig.MULTIPLE){
-                Log.e("Chooser","选取数量为1，强制设置选择模式为单选");
+        if (maxSelectNum <= 1) {
+            if (selectionMode == SelectModeConfig.MULTIPLE) {
+                Log.e("Chooser", "选取数量为1，强制设置选择模式为单选");
             }
             setSelectionMode(SelectModeConfig.SINGLE);
         }
         build12();
         PicListData.getInstance().mediaList.clear();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (openGalleryEngine != null){
-                openGalleryEngine.launch(context,this);
-            }else {
+            if (openGalleryEngine != null) {
+                openGalleryEngine.launch(context, this);
+            } else {
                 forResult12();
             }
-        }else{
+        } else {
             forResult12();
         }
 
     }
 
-    private void forResult12(){
-        if (model != null){
+    private void forResult12() {
+        if (model != null) {
             model.forResult(new OnResultCallbackListener<LocalMedia>() {
                 @Override
                 public void onResult(ArrayList<LocalMedia> result) {
@@ -165,8 +182,8 @@ public class PicChooser {
                     callback.onCancel();
                 }
             });
-        }else{
-            Log.e("Chooser","请先执行build完成初始化");
+        } else {
+            Log.e("Chooser", "请先执行build完成初始化");
         }
     }
 

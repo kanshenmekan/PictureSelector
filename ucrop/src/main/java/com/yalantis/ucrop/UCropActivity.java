@@ -1,6 +1,5 @@
 package com.yalantis.ucrop;
 
-import android.annotation.TargetApi;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -19,7 +18,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -142,13 +140,13 @@ public class UCropActivity extends AppCompatActivity {
                 SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             Window window = this.getWindow();
-            if (window != null){
+            if (window != null) {
                 window.setStatusBarContrastEnforced(false);
                 window.setNavigationBarContrastEnforced(false);
             }
         }
         setContentView(R.layout.ucrop_activity_photobox);
-        RelativeLayout relativeLayout  = findViewById(R.id.ucrop_photobox);
+        RelativeLayout relativeLayout = findViewById(R.id.ucrop_photobox);
         Intent intent = getIntent();
         setupViews(intent);
         relativeLayout.setBackgroundColor(mBackBarColor);
@@ -160,8 +158,8 @@ public class UCropActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        AndroidBarUtils.setStatusBarMode(getWindow(), false);
-        AndroidBarUtils.setNavBarMode(getWindow(), false);
+//        AndroidBarUtils.setStatusBarMode(getWindow(), false);
+//        AndroidBarUtils.setNavBarMode(getWindow(), false);
     }
 
     @Override
@@ -327,6 +325,12 @@ public class UCropActivity extends AppCompatActivity {
     }
 
     private void setupViews(@NonNull Intent intent) {
+        if (intent.hasExtra(UCrop.Options.EXTRA_DARK_STATUS_BAR_BLACK)) {
+            AndroidBarUtils.setStatusBarMode(getWindow(), intent.getBooleanExtra(UCrop.Options.EXTRA_DARK_STATUS_BAR_BLACK, false));
+        }
+        if (intent.hasExtra(UCrop.Options.EXTRA_DARK_NAVIGATION_BAR_BLACK)) {
+            AndroidBarUtils.setNavBarMode(getWindow(), intent.getBooleanExtra(UCrop.Options.EXTRA_DARK_NAVIGATION_BAR_BLACK, false));
+        }
         isForbidCropGifWebp = intent.getBooleanExtra(UCrop.Options.EXTRA_CROP_FORBID_GIF_WEBP, false);
         mBackBarColor = intent.getIntExtra(UCrop.Options.EXTRA_STATUS_BAR_COLOR, ContextCompat.getColor(this, R.color.ucrop_color_statusbar));
         mToolbarColor = intent.getIntExtra(UCrop.Options.EXTRA_TOOL_BAR_COLOR, ContextCompat.getColor(this, R.color.ucrop_color_toolbar));
@@ -336,7 +340,7 @@ public class UCropActivity extends AppCompatActivity {
         mToolbarCancelDrawable = intent.getIntExtra(UCrop.Options.EXTRA_UCROP_WIDGET_CANCEL_DRAWABLE, R.drawable.ucrop_ic_cross);
         mToolbarCropDrawable = intent.getIntExtra(UCrop.Options.EXTRA_UCROP_WIDGET_CROP_DRAWABLE, R.drawable.ucrop_ic_done);
         mToolbarTitle = intent.getStringExtra(UCrop.Options.EXTRA_UCROP_TITLE_TEXT_TOOLBAR);
-        mToolbarTitleSize = intent.getIntExtra(UCrop.Options.EXTRA_UCROP_TITLE_TEXT_SIZE_TOOLBAR,18);
+        mToolbarTitleSize = intent.getIntExtra(UCrop.Options.EXTRA_UCROP_TITLE_TEXT_SIZE_TOOLBAR, 18);
         mToolbarTitle = mToolbarTitle != null ? mToolbarTitle : getResources().getString(R.string.ucrop_label_edit_photo);
         mLogoColor = intent.getIntExtra(UCrop.Options.EXTRA_UCROP_LOGO_COLOR, ContextCompat.getColor(this, R.color.ucrop_color_default_logo));
         mShowBottomControls = !intent.getBooleanExtra(UCrop.Options.EXTRA_HIDE_BOTTOM_CONTROLS, false);
