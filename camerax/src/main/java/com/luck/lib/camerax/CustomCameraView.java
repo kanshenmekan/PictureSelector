@@ -668,7 +668,7 @@ public class CustomCameraView extends RelativeLayout implements CameraXOrientati
 
         @Override
         public void onDisplayChanged(int displayId) {
-            if (displayId == CustomCameraView.this.displayId) {
+            if (displayId == CustomCameraView.this.displayId && mCameraPreviewView.getDisplay() != null) {
                 if (mImageCapture != null) {
                     mImageCapture.setTargetRotation(mCameraPreviewView.getDisplay().getRotation());
                 }
